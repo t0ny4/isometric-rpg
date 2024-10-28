@@ -1,21 +1,20 @@
 import * as THREE from 'three';
 import { World } from './world';
-
-const getKey = (coords) => `${coords.x}-${coords.y}`;
+import { getKey } from './utils';
 
 /**
  * Finds the path between the start and end point (if one exists)
- * @param {THREE.Vector2} start 
- * @param {THREE.Vector2} end 
+ * @param {THREE.Vector3} start 
+ * @param {THREE.Vector3} end 
  * @param {World} world 
- * @return {THREE.Vector2[] | null} If path is found, returns the array of
+ * @return {THREE.Vector3[] | null} If path is found, returns the array of
  * coordinates that make up the path, otherwise returns null
  */
 export function search(start, end, world) {
   // If the end is equal to the start, skip searching
-  if (start.x === end.x && start.y === end.y) return [];
+  if (start.equals(end)) return [];
 
-  console.log(`Searching for path from (${start.x},${start.y}) to (${end.x},${end.y})`);
+  console.log(`Searching for path from (${start.x},${start.z}) to (${end.x},${end.z})`);
 
   let pathFound = false;
   const maxSearchDistance = 20;
@@ -45,7 +44,7 @@ export function search(start, end, world) {
     counter++;
 
     // Did we find the end goal?
-    if (candidate.x === end.x && candidate.y === end.y) {
+    if (candidate.equals(end)) {
       console.log(`Path found (visited ${counter} candidates)`);
       pathFound = true;
       break;
@@ -72,6 +71,8 @@ export function search(start, end, world) {
   let curr = end;
   const path = [curr];
 
+  console.log(path);
+
   while (getKey(curr) !== getKey(start)) {
     const prev = cameFrom.get(getKey(curr));
     path.push(prev);
@@ -86,7 +87,7 @@ export function search(start, end, world) {
 
 /**
  * Returns array of coordinates for neighboring squares
- * @param {THREE.Vector2} coords 
+ * @param {THREE.Vector3} coords 
  * @param {World} world
  * @param {Map} cost
  */
@@ -95,19 +96,19 @@ function getNeighbors(coords, world, cost) {
 
   // Left
   if (coords.x > 0) {
-    neighbors.push(new THREE.Vector2(coords.x - 1, coords.y));
+    neighbors.push(new THREE.Vector3(coords.x - 1, 0, coords.z));
   }
   // Right
   if (coords.x < world.width - 1) {
-    neighbors.push(new THREE.Vector2(coords.x + 1, coords.y));
+    neighbors.push(new THREE.Vector3(coords.x + 1, 0, coords.z));
   }
   // Top
-  if (coords.y > 0) {
-    neighbors.push(new THREE.Vector2(coords.x, coords.y - 1));
+  if (coords.z > 0) {
+    neighbors.push(new THREE.Vector3(coords.x, 0, coords.z - 1));
   }
   // Bottom
-  if (coords.y < world.height - 1) {
-    neighbors.push(new THREE.Vector2(coords.x, coords.y + 1));
+  if (coords.z < world.height - 1) {
+    neighbors.push(new THREE.Vector3(coords.x, 0, coords.z + 1));
   }
 
   // Cost to get to neighbor square is the current square cost + 1

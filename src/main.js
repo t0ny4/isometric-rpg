@@ -3,7 +3,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { World } from './world';
-import { Player } from './player';
+import { HumanPlayer } from './players/HumanPlayer';
+import { CombatManager } from './CombatManager';
 
 const gui = new GUI();
 
@@ -26,8 +27,15 @@ controls.update();
 const world = new World(10, 10);
 scene.add(world);
 
-const player = new Player(camera, world);
-scene.add(player);
+const player1 = new HumanPlayer(new THREE.Vector3(1, 0, 5), camera, world);
+scene.add(player1);
+
+const player2 = new HumanPlayer(new THREE.Vector3(8, 0, 3), camera, world);
+scene.add(player2);
+
+const combatManager = new CombatManager();
+combatManager.addPlayer(player1);
+combatManager.addPlayer(player2);
 
 const sun = new THREE.DirectionalLight();
 sun.intensity = 3;
@@ -56,5 +64,6 @@ worldFolder.add(world, 'height', 1, 20, 1).name('Height');
 worldFolder.add(world, 'treeCount', 1, 100, 1).name('Tree Count');
 worldFolder.add(world, 'rockCount', 1, 100, 1).name('Rock Count');
 worldFolder.add(world, 'bushCount', 1, 100, 1).name('Bush Count');
-
 worldFolder.add(world, 'generate').name('Generate');
+
+combatManager.takeTurns();
