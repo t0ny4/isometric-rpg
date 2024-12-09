@@ -4,6 +4,7 @@ import { GameObject } from './objects/GameObject';
 import { Rock } from './objects/Rock';
 import { Tree } from './objects/Tree';
 import { getKey } from './utils';
+import { HumanPlayer } from './players/HumanPlayer';
 
 const textureLoader = new THREE.TextureLoader();
 const gridTexture = textureLoader.load('textures/grid.png');
@@ -11,32 +12,41 @@ const gridTexture = textureLoader.load('textures/grid.png');
 export class World extends THREE.Group {
   #objectMap = new Map();
 
-  constructor(width, height) {
+  constructor(width, height, camera) {
     super();
 
     this.width = width;
     this.height = height;
     this.treeCount = 10;
-    this.rockCount = 20;
+    this.rockCount = 10;
     this.bushCount = 10;
 
-    this.trees = new THREE.Group();
-    this.add(this.trees);
+    this.objects = new THREE.Group();
+    this.add(this.objects);
 
-    this.rocks = new THREE.Group();
-    this.add(this.rocks);
+    this.players = new THREE.Group();
+    this.objects.add(this.players);
 
-    this.bushes = new THREE.Group();
-    this.add(this.bushes);
+    this.props = new THREE.Group();
+    this.objects.add(this.props);
 
     this.path = new THREE.Group();
     this.add(this.path);
 
-    this.generate();
+    this.generate(camera);
   }
 
-  generate() {
+  generate(camera) {
     this.clear();
+
+    const player1 = new HumanPlayer(new THREE.Vector3(1, 0, 5), camera, this);
+    player1.name = 'Player 1';
+    this.addObject(player1, 'players');
+
+    const player2 = new HumanPlayer(new THREE.Vector3(8, 0, 3), camera, this);
+    player2.name = 'Player 2';
+    this.addObject(player2, 'players');
+
     this.createTerrain();
     this.createTrees();
     this.createRocks();
@@ -50,9 +60,8 @@ export class World extends THREE.Group {
       this.remove(this.terrain);
     }
 
-    this.trees.clear();
-    this.rocks.clear();
-    this.bushes.clear();
+    this.players.clear();
+    this.props.clear();
     this.#objectMap.clear();
   }
 
@@ -83,7 +92,7 @@ export class World extends THREE.Group {
       );
 
       const tree = new Tree(coords);
-      this.addObject(tree, coords, this.trees);
+      this.addObject(tree, 'props');
     }
   }
 
@@ -96,7 +105,7 @@ export class World extends THREE.Group {
       );
 
       const rock = new Rock(coords);
-      this.addObject(rock, coords, this.rocks);
+      this.addObject(rock, 'props');
     }
   }
 
@@ -109,7 +118,7 @@ export class World extends THREE.Group {
       );
 
       const bush = new Bush(coords);
-      this.addObject(bush, coords, this.bushes);
+      this.addObject(bush, 'props');
     }
   }
 
@@ -117,18 +126,35 @@ export class World extends THREE.Group {
    * Adds an object to the world at the specified coordinates unless
    * an object already exists at those coordinates
    * @param {GameObject} object 
-   * @param {THREE.Vector3} coords 
-   * @param {THREE.Group} group The group to add the object to
+   * @param {'players' | 'props'} group The group to add the object to
    * @returns 
    */
-  addObject(object, coords, group) {
+  addObject(object, group) {
     // Don't place objects on top of each other
-    if (this.#objectMap.has(getKey(coords))) {
+    if (this.#objectMap.has(getKey(object.coords))) {
       return false;
     }
 
-    group.add(object);
-    this.#objectMap.set(getKey(coords), object);
+    switch (group) {
+      case 'players':
+        this.players.add(object);
+        break;
+      case 'props':
+        this.props.add(object);
+        break;
+    }
+
+    object.onMove = (object, oldCoords, newCoords) => {
+      this.#objectMap.delete(getKey(oldCoords));
+      this.#objectMap.set(getKey(newCoords), object);
+    };
+
+    object.onDestroy = (object) => {
+      this.#objectMap.delete(getKey(object.coords));
+      object.removeFromParent();
+    };
+
+    this.#objectMap.set(getKey(object.coords), object);
 
     return true;
   }

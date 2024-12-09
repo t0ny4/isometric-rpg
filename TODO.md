@@ -28,18 +28,27 @@
   - [x] Combat Manager
     - [x] Iterate through all the players
     - [x] Request an action from each player
-- [ ] Combat
-  - [ ] Action
-    - [ ] MeleeAttackAction
+- [x] Combat
+  - [x] Action
+    - [x] MeleeAttackAction
     - [ ] RangedAttackAction
-  - [ ] Enemies
-    - [ ] Hit Points
-    - [ ] Remove the enemies when they are killed
-  - [ ] Pathfinding
-    - [ ] Don't allow players to move through other players
-  - [ ] Asynchronous Input
-    - [ ] Selecting a target object
-  - [ ] Add some UI
-    - [ ] List out actions for the active player
-    - [ ] Status bar
+    - [x] WaitAction
+  - [x] Enemies
+    - [x] Hit Points
+    - [x] Remove the enemies when they are killed
+  - [x] Pathfinding
+    - [x] Don't allow players to move through other players
+  - [x] Asynchronous Input
+    - [x] Selecting a target object
+  - [x] Add some UI
+    - [x] List out actions for the active player
+    - [x] Status bar
+    - [x] Display player/object hit points above their head
+- [ ] Graphics Overhaul
+  - [ ] 3D assets for the props
+  - [ ] 3D assets for the player models
+  - [ ] Skybox
+  - [ ] Improved terrain (perlin noise? hills? water?)
+  - [ ] Fog
+- [ ] Player Animation
 - [ ] Enemy AI

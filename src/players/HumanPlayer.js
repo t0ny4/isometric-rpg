@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Player } from './Player';
-import { MovementAction } from '../actions/MovementAction';
+import { Action } from '../actions';
+import { updateStatus } from '../utils';
 
 export class HumanPlayer extends Player {
   name = 'HumanPlayer';
@@ -10,19 +11,24 @@ export class HumanPlayer extends Player {
    */
   raycaster = new THREE.Raycaster();
 
+  constructor(coords, camera, world) {
+    super(coords, camera, world);
+    this.raycaster.layers.disable(1);
+  }
+
   /**
    * Wait for the player to choose a target square
    * @returns {Promise<Vector3 | null>}
    */
   async getTargetSquare() {
+    updateStatus('Select a target square');
+
     return new Promise((resolve) => {
       /**
        * Event handler when user clicks on the screen
        * @param {MouseEvent} event 
        */
-      function onMouseDown(event) {
-        console.log(event);
-
+      const onMouseDown = (event) => {
         const coords = new THREE.Vector2(
           (event.clientX / window.innerWidth) * 2 - 1,
           - (event.clientY / window.innerHeight) * 2 + 1
@@ -37,20 +43,13 @@ export class HumanPlayer extends Player {
             0,
             Math.floor(intersections[0].point.z)
           );
-          window.removeEventListener('mousedown', onMouseDownBound);
+          window.removeEventListener('mousedown', onMouseDown);
           resolve(selectedCoords);
         }
       };
 
-      // Need to assign the bound function to a separate variable
-      // in order to remove this event listener later on. Using
-      // bind() results in a different function signature 
-      // each time that you use it.
-      const onMouseDownBound = onMouseDown.bind(this);
-
       // Wait for player to select a square
-      window.addEventListener('mousedown', onMouseDownBound);
-      console.log('Waiting for player to select a target square');
+      window.addEventListener('mousedown', onMouseDown);
     });
   }
 
@@ -59,7 +58,33 @@ export class HumanPlayer extends Player {
    * @returns {Promise<GameObject | null>}
    */
   async getTargetObject() {
-    return null;
+    updateStatus('Select a target object');
+
+    return new Promise((resolve) => {
+      /**
+       * Event handler when user clicks on the screen
+       * @param {MouseEvent} event 
+       */
+      const onMouseDown = (event) => {
+        const coords = new THREE.Vector2(
+          (event.clientX / window.innerWidth) * 2 - 1,
+          - (event.clientY / window.innerHeight) * 2 + 1
+        );
+
+        this.raycaster.setFromCamera(coords, this.camera);
+        const intersections = this.raycaster.intersectObject(this.world.objects, true);
+
+        if (intersections.length > 0) {
+          // Intersection is occurring with the mesh
+          // The parent of the mesh is the GameObject
+          const selectedObject = intersections[0].object.parent;
+          window.removeEventListener('mousedown', onMouseDown);
+          resolve(selectedObject);
+        }
+      };
+
+      window.addEventListener('mousedown', onMouseDown);
+    });
   }
 
   /**
@@ -67,9 +92,18 @@ export class HumanPlayer extends Player {
    * @returns {Promise<Action | null>}
    */
   async requestAction() {
-    console.log('Requesting action...');
-    const selectedAction = new MovementAction(this, this.world);
-    console.log(`Player ${this.name} selected action ${selectedAction.name}`);
-    return selectedAction;
+    const actionButtonContainer = document.getElementById('actions');
+    actionButtonContainer.innerHTML = '';
+
+    const actions = this.getActions();
+
+    return new Promise((resolve) => {
+      actions.forEach((action) => {
+        const button = document.createElement('button');
+        button.innerText = action.name;
+        button.onclick = () => resolve(action);
+        actionButtonContainer.appendChild(button);
+      });
+    });
   }
 }

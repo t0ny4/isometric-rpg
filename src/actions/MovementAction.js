@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Action } from './Action';
 import { search } from '../pathfinding';
 import { GameObject } from '../objects/GameObject';
+import { updateStatus } from '../utils';
 
 const breadcrumb = new THREE.Mesh(
   new THREE.SphereGeometry(0.1),
@@ -9,7 +10,7 @@ const breadcrumb = new THREE.Mesh(
 );
 
 export class MovementAction extends Action {
-  name = 'MovementAction';
+  name = 'Move';
 
   path = [];
   pathIndex = 0;
@@ -45,6 +46,8 @@ export class MovementAction extends Action {
       // Clear the existing path update interval
       clearInterval(this.pathUpdater);
 
+      updateStatus('Moving...');
+
       // Add breadcrumbs to the world
       this.path.forEach((coords) => {
         const node = breadcrumb.clone();
@@ -61,15 +64,27 @@ export class MovementAction extends Action {
   async canPerform() {
     const selectedCoords = await this.source.getTargetSquare();
 
-    console.log('canPerform ', selectedCoords);
-
     // Find path from player's current position to the selected square
     this.path = search(
       this.source.coords,
       selectedCoords,
       this.world);
 
+    if (this.path === null) {
+      return {
+        value: false,
+        reason: 'Could not find path to target square.'
+      };
+    }
+
+    if (this.path.length === 0) {
+      return {
+        value: false,
+        reason: 'Pick square other than starting square'
+      };
+    }
+
     // Return true if a valid path was found
-    return (this.path !== null && this.path.length > 0);
+    return { value: true };
   }
 }

@@ -28,9 +28,9 @@ export class Action {
 
   /**
    * Returns true/false if the action can be performed
-   * @returns {Promise<boolean>}
+   * @returns {Promise<{ value: boolean, reason: string? >}
    */
   async canPerform() {
-    return true;
+    return { value: true };
   }
 }
