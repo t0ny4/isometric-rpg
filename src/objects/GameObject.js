@@ -67,7 +67,7 @@ export class GameObject extends THREE.Group {
     this.healthOverlay.layers.set(1);
     this.add(this.healthOverlay);
 
-	this.displayedHitPoints = this.hitPoints;
+    this.displayedHitPoints = this.hitPoints;
     this.updateHitpointOverlay();
   }
 
@@ -91,10 +91,10 @@ export class GameObject extends THREE.Group {
       this.destroy();
     } else if (this.hitPoints > this.maxHitPoints) {
       this.hitPoints = this.maxHitPoints;
-	}
+    }
 
     this.updateHitpointOverlay();
-	// make object healthbar visible when damaged
+    // make object healthbar visible when damaged
     this.healthOverlay.visible = true;
   }
 
@@ -118,20 +118,20 @@ export class GameObject extends THREE.Group {
       this.healthOverlay.material.dispose();
     }
 
-	if (this.hitPoints < 1) {
-		return;
-	}
+    if (this.hitPoints < 1) {
+      return;
+    }
 
-	let target = this.displayedHitPoints;
+    let target = this.displayedHitPoints;
 
-	if (this.displayedHitPoints !== this.hitPoints) {
-		target += (this.displayedHitPoints < this.hitPoints) ? 1 : -1;
-		this.displayedHitPoints = target;
-		if (target != this.hitPoints) {
-			setTimeout(this.updateHitpointOverlay.bind(this), 50);
-		}
-	}
+    if (this.displayedHitPoints !== this.hitPoints) {
+      target += (this.displayedHitPoints < this.hitPoints) ? 1 : -1;
+      this.displayedHitPoints = target;
+      if (target != this.hitPoints) {
+        setTimeout(this.updateHitpointOverlay.bind(this), 50);
+      }
+    }
 
-	this.healthOverlay.material = createHealthbarMaterial(target, this.maxHitPoints);
+    this.healthOverlay.material = createHealthbarMaterial(target, this.maxHitPoints);
   }
 }

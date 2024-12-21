@@ -46,59 +46,60 @@ export function createTextMaterial(text) {
 
 export const createHealthbarMaterial = (() => {
 
-	const width = 96;
-	const height = 14;
-	const border = 2;
-	const segmentCount = 25;
+  const width = 96;
+  const height = 14;
+  const border = 2;
+  const segmentCount = 25;
 
-	const canvas = document.createElement('canvas');
-	canvas.width = width + (border * 2);
-	canvas.height = height + (border * 2);
-	const ctx = canvas.getContext('2d');
+  const canvas = document.createElement('canvas');
+  canvas.width = width + (border * 2);
+  canvas.height = height + (border * 2);
+  const ctx = canvas.getContext('2d');
 
-	ctx.strokeStyle = 'black';
-	ctx.strokeRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = 'black';
+  ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-	const segmentSize = width / segmentCount;
-	const textureCache = [];
+  const segmentSize = width / segmentCount;
+  /** @type {THREE.CanvasTexture[]} */
+  const textureCache = [];
 
-	/**
- 	 * @param {number} curHealth
- 	 * @param {number} maxHealth
- 	 * @returns {THREE.SpriteMaterial}
- 	 */
-	return (curHealth, maxHealth) => {
+  /**
+   * @param {number} curHealth
+   * @param {number} maxHealth
+   * @returns {THREE.SpriteMaterial}
+   */
+  return (curHealth, maxHealth) => {
 
-		//console.assert(maxHealth !== 0, 'maxHealth === 0');
-		//console.assert(curHealth <= maxHealth, 'curHealth > maxHealth');
+    //console.assert(maxHealth !== 0, 'maxHealth === 0');
+    //console.assert(curHealth <= maxHealth, 'curHealth > maxHealth');
 
-		const ratio = curHealth / maxHealth;
-		const segment = Math.ceil(ratio * segmentCount);
+    const ratio = curHealth / maxHealth;
+    const segment = Math.ceil(ratio * segmentCount);
 
-		if (!textureCache[segment]) {
+    if (!textureCache[segment]) {
 
-			const size = Math.round(segment * segmentSize);
+      const size = Math.round(segment * segmentSize);
 
-			const colour = (ratio > 0.74) ? '#008000D0' : (ratio < 0.34) ? '#FF0000B0' : '#808000D0';
+      const colour = (ratio > 0.74) ? '#008000D0' : (ratio < 0.34) ? '#FF0000B0' : '#808000D0';
 
-			const remaining = width - size;
+      const remaining = width - size;
 
-			ctx.clearRect(border, border, width, height);
+      ctx.clearRect(border, border, width, height);
 
-			if (size > 0) {
-				ctx.fillStyle = colour;
-				ctx.fillRect(border, border, size, height);
-			}
-			if (remaining > 0) {
-				ctx.fillStyle = '#11111170';
-				ctx.fillRect(border + size, border, remaining, height);
-			}
+      if (size > 0) {
+        ctx.fillStyle = colour;
+        ctx.fillRect(border, border, size, height);
+      }
+      if (remaining > 0) {
+        ctx.fillStyle = '#11111170';
+        ctx.fillRect(border + size, border, remaining, height);
+      }
 
-			textureCache[segment] = new THREE.CanvasTexture(canvas);
-		}
+      textureCache[segment] = new THREE.CanvasTexture(canvas);
+    }
 
-		return new THREE.SpriteMaterial({
-			map: textureCache[segment]
-		});
-	};
+    return new THREE.SpriteMaterial({
+      map: textureCache[segment]
+    });
+  };
 })();
