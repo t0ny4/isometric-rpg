@@ -29,6 +29,7 @@ export class GameObject extends THREE.Group {
 
   healthOverlayHeight = 0.08;
   healthOverlayWidth = 0.5;
+  displayedHitPoints = 0;
 
   /**
    * Callback triggered when the object moves
@@ -64,6 +65,7 @@ export class GameObject extends THREE.Group {
     this.healthOverlay.layers.set(1);
     this.add(this.healthOverlay);
 
+	this.displayedHitPoints = this.hitPoints;
     this.updateHitpointOverlay();
   }
 
@@ -111,6 +113,21 @@ export class GameObject extends THREE.Group {
     if (this.healthOverlay.material) {
       this.healthOverlay.material.dispose();
     }
-    this.healthOverlay.material = createHealthbarMaterial(this.hitPoints, this.maxHitPoints);
+
+	if (this.hitPoints < 1) {
+		return;
+	}
+
+	let target = this.displayedHitPoints;
+
+	if (this.displayedHitPoints !== this.hitPoints) {
+		target += (this.displayedHitPoints < this.hitPoints) ? 1 : -1;
+		this.displayedHitPoints = target;
+		if (target != this.hitPoints) {
+			setTimeout(this.updateHitpointOverlay.bind(this), 50);
+		}
+	}
+
+	this.healthOverlay.material = createHealthbarMaterial(target, this.maxHitPoints);
   }
 }
