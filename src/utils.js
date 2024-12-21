@@ -46,14 +46,18 @@ export function createTextMaterial(text) {
 
 export const createHealthbarMaterial = (() => {
 
-	const width = 100;
-	const height = 16;
+	const width = 96;
+	const height = 14;
+	const border = 2;
 	const segmentCount = 25;
 
 	const canvas = document.createElement('canvas');
-	canvas.width = width;
-	canvas.height = height;
+	canvas.width = width + (border * 2);
+	canvas.height = height + (border * 2);
 	const ctx = canvas.getContext('2d');
+
+	ctx.strokeStyle = 'black';
+	ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
 	const segmentSize = width / segmentCount;
 	const textureCache = [];
@@ -75,20 +79,19 @@ export const createHealthbarMaterial = (() => {
 
 			const size = Math.round(segment * segmentSize);
 
-			const colour = (ratio > 0.74) ? '#080' : (ratio < 0.34) ? '#F00' : '#880';
+			const colour = (ratio > 0.74) ? '#008000D0' : (ratio < 0.34) ? '#FF0000B0' : '#808000D0';
 
 			const remaining = width - size;
 
-			ctx.fillStyle = 'white';
-			ctx.fillRect(0, 0, width, height);
+			ctx.clearRect(border, border, width, height);
 
 			if (size > 0) {
 				ctx.fillStyle = colour;
-				ctx.fillRect(1, 1, size - 2, height - 2);
+				ctx.fillRect(border, border, size, height);
 			}
 			if (remaining > 0) {
-				ctx.fillStyle = '#111';
-				ctx.fillRect(size - 1, 1, remaining, height - 2);
+				ctx.fillStyle = '#11111170';
+				ctx.fillRect(border + size, border, remaining, height);
 			}
 
 			textureCache[segment] = new THREE.CanvasTexture(canvas);
