@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GameObject } from '../objects/GameObject';
-import { Action, MeleeAttackAction, MovementAction, RangedAttackAction, WaitAction } from '../actions';
+import { Action, MeleeAttackAction, MovementAction, RangedAttackAction, WaitAction, RangedHealAction } from '../actions';
 
 const geometry = new THREE.CapsuleGeometry(0.25, 0.5);
 
@@ -9,6 +9,8 @@ const geometry = new THREE.CapsuleGeometry(0.25, 0.5);
  */
 export class Player extends GameObject {
   name = 'Player';
+
+  isPlayer = true;
 
   /**
    * Instantiates a new instance of the player
@@ -37,7 +39,8 @@ export class Player extends GameObject {
       new MovementAction(this),
       new MeleeAttackAction(this),
       new RangedAttackAction(this),
-      new WaitAction()
+	  new RangedHealAction(this),
+      new WaitAction(),
     ]
   }
 

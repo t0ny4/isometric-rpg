@@ -31,6 +31,8 @@ export class GameObject extends THREE.Group {
   healthOverlayWidth = 0.5;
   displayedHitPoints = 0;
 
+  isPlayer = false;
+
   /**
    * Callback triggered when the object moves
    * @param {GameObject} object
@@ -87,7 +89,9 @@ export class GameObject extends THREE.Group {
     if (this.hitPoints <= 0) {
       this.hitPoints = 0;
       this.destroy();
-    }
+    } else if (this.hitPoints > this.maxHitPoints) {
+      this.hitPoints = this.maxHitPoints;
+	}
 
     this.updateHitpointOverlay();
 	// make object healthbar visible when damaged
