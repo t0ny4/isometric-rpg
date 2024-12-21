@@ -10,7 +10,7 @@ const rockMaterial = new THREE.MeshStandardMaterial({
 
 export class Rock extends GameObject {
   /**
-   * @param {THREE.Vector3} coords 
+   * @param {THREE.Vector3} coords
    */
   constructor(coords) {
     const minRadius = 0.2;
@@ -28,6 +28,9 @@ export class Rock extends GameObject {
     rockMesh.position.set(0.5, height / 4, 0.5);
 
     super(coords, rockMesh);
+
+    this.healthOverlay.scale.set(this.healthOverlayWidth, this.healthOverlayHeight, 1);
+	this.healthOverlay.position.y =  (height * 1.25) + 0.05;
 
     this.name = `Rock-(${coords.x},${coords.z})`;
   }

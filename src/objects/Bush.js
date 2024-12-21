@@ -10,7 +10,7 @@ const bushGeometry = new THREE.SphereGeometry(1, 8, 8);
 
 export class Bush extends GameObject {
   /**
-   * @param {THREE.Vector3} coords 
+   * @param {THREE.Vector3} coords
    */
   constructor(coords) {
     const minRadius = 0.1;
@@ -23,6 +23,9 @@ export class Bush extends GameObject {
     bushMesh.position.set(0.5, radius, 0.5);
 
     super(coords, bushMesh);
+
+	this.healthOverlay.scale.set(this.healthOverlayWidth, this.healthOverlayHeight, 1);
+    this.healthOverlay.position.y = radius * 2 + 0.05;
 
     this.name = `Bush-(${coords.x},${coords.z})`;
   }

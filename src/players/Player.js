@@ -21,6 +21,9 @@ export class Player extends GameObject {
 
     super(coords, playerMesh);
 
+    this.healthOverlay.scale.set(this.healthOverlayWidth, this.healthOverlayHeight, 1);
+	this.healthOverlay.position.y =  1 + 0.05;
+
     this.healthOverlay.visible = true;
 
     this.moveTo(coords);

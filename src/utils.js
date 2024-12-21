@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 
 /**
- * @param {string} text 
+ * @param {string} text
  */
 export function updateStatus(text) {
   document.getElementById('status-text').innerText = text;
 }
 
 /**
- * @param {THREE.Vector3} coords 
+ * @param {THREE.Vector3} coords
  * @returns Returns the key for the object map given a set of coordinates
  */
 export function getKey(coords) {
@@ -16,8 +16,8 @@ export function getKey(coords) {
 }
 
 /**
- * 
- * @param {string} text 
+ *
+ * @param {string} text
  * @returns {THREE.SpriteMaterial}
  */
 export function createTextMaterial(text) {
@@ -43,3 +43,59 @@ export function createTextMaterial(text) {
     map: new THREE.CanvasTexture(canvas)
   });
 }
+
+export const createHealthbarMaterial = (() => {
+
+	const width = 100;
+	const height = 16;
+	const segmentCount = 25;
+
+	const canvas = document.createElement('canvas');
+	canvas.width = width;
+	canvas.height = height;
+	const ctx = canvas.getContext('2d');
+
+	const segmentSize = width / segmentCount;
+	const textureCache = [];
+
+	/**
+ 	 * @param {number} curHealth
+ 	 * @param {number} maxHealth
+ 	 * @returns {THREE.SpriteMaterial}
+ 	 */
+	return (curHealth, maxHealth) => {
+
+		//console.assert(maxHealth !== 0, 'maxHealth === 0');
+		//console.assert(curHealth <= maxHealth, 'curHealth > maxHealth');
+
+		const ratio = curHealth / maxHealth;
+		const segment = Math.ceil(ratio * segmentCount);
+
+		if (!textureCache[segment]) {
+
+			const size = Math.round(segment * segmentSize);
+
+			const colour = (ratio > 0.74) ? '#080' : (ratio < 0.34) ? '#F00' : '#880';
+
+			const remaining = width - size;
+
+			ctx.fillStyle = 'white';
+			ctx.fillRect(0, 0, width, height);
+
+			if (size > 0) {
+				ctx.fillStyle = colour;
+				ctx.fillRect(1, 1, size - 2, height - 2);
+			}
+			if (remaining > 0) {
+				ctx.fillStyle = '#111';
+				ctx.fillRect(size - 1, 1, remaining, height - 2);
+			}
+
+			textureCache[segment] = new THREE.CanvasTexture(canvas);
+		}
+
+		return new THREE.SpriteMaterial({
+			map: textureCache[segment]
+		});
+	};
+})();

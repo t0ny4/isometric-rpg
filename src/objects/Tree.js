@@ -10,13 +10,16 @@ const treeMaterial = new THREE.MeshStandardMaterial({
 
 export class Tree extends GameObject {
   /**
-   * @param {THREE.Vector3} coords 
+   * @param {THREE.Vector3} coords
    */
   constructor(coords) {
     const treeMesh = new THREE.Mesh(treeGeometry, treeMaterial);
     treeMesh.position.set(0.5, 0.5, 0.5);
 
     super(coords, treeMesh);
+
+    this.healthOverlay.scale.set(this.healthOverlayWidth, this.healthOverlayHeight, 1);
+	this.healthOverlay.position.y =  1 + 0.05;
 
     this.name = `Tree-(${coords.x},${coords.z})`;
   }

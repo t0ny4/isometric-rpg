@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { createTextMaterial } from '../utils';
+import { createHealthbarMaterial } from '../utils';
 
 export class GameObject extends THREE.Group {
   /**
@@ -27,22 +27,25 @@ export class GameObject extends THREE.Group {
    */
   healthOverlay;
 
+  healthOverlayHeight = 0.08;
+  healthOverlayWidth = 0.5;
+
   /**
    * Callback triggered when the object moves
-   * @param {GameObject} object 
-   * @param {THREE.Vector3} oldCoords 
-   * @param {THREE.Vector3} newCoords 
+   * @param {GameObject} object
+   * @param {THREE.Vector3} oldCoords
+   * @param {THREE.Vector3} newCoords
    */
   onMove = (object, oldCoords, newCoords) => { }
 
   /**
    * Callback triggered when the object's hit points go to zero
-   * @param {GameObject} object 
+   * @param {GameObject} object
    */
   onDestroy = (object) => { }
 
   /**
-   * @param {THREE.Vector3} coords 
+   * @param {THREE.Vector3} coords
    * @param {THREE.Mesh} mesh
    */
   constructor(coords, mesh) {
@@ -56,6 +59,7 @@ export class GameObject extends THREE.Group {
 
     this.healthOverlay = new THREE.Sprite();
     this.healthOverlay.position.set(0.5, 1.2, 0.5);
+    this.healthOverlay.center = new THREE.Vector2(0.5, 0);
     this.healthOverlay.visible = false;
     this.healthOverlay.layers.set(1);
     this.add(this.healthOverlay);
@@ -84,11 +88,13 @@ export class GameObject extends THREE.Group {
     }
 
     this.updateHitpointOverlay();
+	// make object healthbar visible when damaged
+    this.healthOverlay.visible = true;
   }
 
   /**
    * Moves the player to the coordinates
-   * @param {THREE.Vector3} coords 
+   * @param {THREE.Vector3} coords
    */
   moveTo(coords) {
     const oldCoords = this.coords;
@@ -105,6 +111,6 @@ export class GameObject extends THREE.Group {
     if (this.healthOverlay.material) {
       this.healthOverlay.material.dispose();
     }
-    this.healthOverlay.material = createTextMaterial(`${this.hitPoints}/${this.maxHitPoints}`);
+    this.healthOverlay.material = createHealthbarMaterial(this.hitPoints, this.maxHitPoints);
   }
 }
