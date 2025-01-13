@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { GameObject } from '../objects/GameObject';
-import { World } from '../world';
 import { Action, MeleeAttackAction, MovementAction, RangedAttackAction, WaitAction } from '../actions';
 
 const geometry = new THREE.CapsuleGeometry(0.25, 0.5);
@@ -14,10 +13,8 @@ export class Player extends GameObject {
   /**
    * Instantiates a new instance of the player
    * @param {THREE.Vector3} coords 
-   * @param {THREE.Camera} camera 
-   * @param {World} world 
    */
-  constructor(coords, camera, world) {
+  constructor(coords) {
     const material = new THREE.MeshStandardMaterial({ color: 0x4040c0 });
     const playerMesh = new THREE.Mesh(geometry, material);
     playerMesh.position.set(0.5, 0.5, 0.5);
@@ -27,8 +24,6 @@ export class Player extends GameObject {
     this.healthOverlay.visible = true;
 
     this.moveTo(coords);
-    this.camera = camera;
-    this.world = world;
   }
 
   /**
@@ -36,7 +31,7 @@ export class Player extends GameObject {
    */
   getActions() {
     return [
-      new MovementAction(this, this.world),
+      new MovementAction(this),
       new MeleeAttackAction(this),
       new RangedAttackAction(this),
       new WaitAction()

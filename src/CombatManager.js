@@ -1,27 +1,8 @@
 import * as THREE from 'three';
-import { Player } from './players/Player';
 import { World } from './world';
 import { updateStatus } from './utils';
 
 export class CombatManager {
-  /**
-   * @type {Player[]} Active players in combat
-   */
-  players = [];
-
-  constructor() {
-
-  }
-
-  /**
-   * Get player's initiative and add them to the
-   * array of players
-   * @param {Player} player 
-   */
-  addPlayer(player) {
-    this.players.push(player);
-  }
-
   /**
    * Main combat loop
    * @param {World} world 
@@ -39,10 +20,10 @@ export class CombatManager {
 
         do {
           const action = await player.requestAction();
-          const result = await action.canPerform();
+          const result = await action.canPerform(world);
           if (result.value) {
             // Wait for the player to finish performing their action
-            await action.perform();
+            await action.perform(world);
             actionPerformed = true;
           } else {
             updateStatus(result.reason);
