@@ -28,6 +28,11 @@ export class GameObject extends THREE.Group {
   healthOverlay;
 
   /**
+   * @type {true}
+   */
+  isGameObject = true;
+
+  /**
    * Callback triggered when the object moves
    * @param {GameObject} object 
    * @param {THREE.Vector3} oldCoords 

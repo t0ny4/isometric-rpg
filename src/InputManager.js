@@ -87,15 +87,29 @@ class InputManager {
 
         if (intersections.length > 0) {
           // Intersection is occurring with the mesh
-          // The parent of the mesh is the GameObject
-          const selectedObject = intersections[0].object.parent;
-          window.removeEventListener('mousedown', onMouseDown);
-          resolve(selectedObject);
+          // Walk up the tree to find the GameObject
+          const selectedObject = findGameObject(intersections[0].object);
+          if (selectedObject) {
+            window.removeEventListener('mousedown', onMouseDown);
+            resolve(selectedObject);
+          }
         }
       };
 
       window.addEventListener('mousedown', onMouseDown);
     });
+  }
+}
+
+function findGameObject(obj) {
+  while(1) {
+    if (obj.isGameObject) {
+      return obj;
+    }
+    if (!obj.parent) {
+      return null;
+    }
+    obj = obj.parent;
   }
 }
 
